@@ -180,9 +180,12 @@ std::vector<Target_t> CAimbotHitscan::SortTargets(CTFPlayer* pLocal, CTFWeaponBa
 	F::AimbotGlobal.SortTargets(&validTargets, sortMethod);
 
 	std::vector<Target_t> sortedTargets = {};
-	int i = 0; for (auto& target : validTargets)
+	int i = 0; 
+	for (auto& target : validTargets)
 	{
-		i++; if (i > Vars::Aimbot::General::MaxTargets.Value) break;
+		i++; 
+		if (i >= 10) 
+			break;
 
 		sortedTargets.push_back(target);
 	}

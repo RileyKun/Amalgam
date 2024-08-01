@@ -134,7 +134,6 @@ void CMenu::MenuAimbot()
 				bTransparent = FGet(Vars::Aimbot::General::AimType) != 2;
 					FSlider("Smoothing## Hitscan", Vars::Aimbot::General::Smoothing, 0.f, 100.f, 1.f, "%.0f%%", FSlider_Clamp);
 				bTransparent = false;
-				FSlider("Max targets", Vars::Aimbot::General::MaxTargets, 1, 6, 1, "%d", FSlider_Clamp);
 				bTransparent = !(FGet(Vars::Aimbot::General::Ignore) & 1 << 1);
 					FSlider("Ignore cloak", Vars::Aimbot::General::IgnoreCloakPercentage, 0, 100, 10, "%d%%", FSlider_Clamp);
 				bTransparent = !(FGet(Vars::Aimbot::General::Ignore) & 1 << 4);
@@ -191,6 +190,7 @@ void CMenu::MenuAimbot()
 				bTransparent = !FGet(Vars::Aimbot::Projectile::AutoRelease);
 					FSlider("Auto release", Vars::Aimbot::Projectile::AutoRelease, 0.f, 100.f, 5.f, "%.0f%%", FSlider_Clamp | FSlider_Precision);
 				bTransparent = false;
+				FSlider("Max targets", Vars::Aimbot::General::MaxTargets, 1, 6, 1, "%d", FSlider_Clamp);
 			} EndSection();
 			if (Vars::Debug::Info.Value)
 			{
