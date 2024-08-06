@@ -24,7 +24,7 @@ __forceinline bool CheckRenderIsCompatible()
 	auto iLevel = cvDXLevel->GetInt();
 	if(iLevel < 90)
 	{
-		std::string fmt = std::format("You are running with graphics options that Amalgam does not support.\nPlease remove -dxlevel {} from your launch options and reinject.\0", iLevel);
+		std::string fmt = std::format("You are running with graphics options that Amalgam does not support.\nPlease remove -dxlevel {} from your launch options and reinject.", iLevel);
 		MessageBox(nullptr, fmt.c_str(), "Error", MB_ICONERROR);
 		U::Core.bUnload = true;
 		return false;
