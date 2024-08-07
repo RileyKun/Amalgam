@@ -13,43 +13,6 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 template <typename T>
 using ComPtr = Microsoft::WRL::ComPtr<T>;
 
-/*MAKE_HOOK(Direct3DDevice9_EndScene, U::Memory.GetVFunc(I::DirectXDevice, 42), HRESULT, __stdcall,
-	LPDIRECT3DDEVICE9 pDevice)
-{
-	static void* fRegularAddr = 0, *fOverlayAddr = 0;
-	if (!fRegularAddr || !fOverlayAddr)
-	{
-		MEMORY_BASIC_INFORMATION info;
-		VirtualQuery(_ReturnAddress(), &info, sizeof(MEMORY_BASIC_INFORMATION));
-
-		char mod[MAX_PATH];
-		GetModuleFileNameA((HMODULE)info.AllocationBase, mod, MAX_PATH);
-
-		if (strstr(mod, "\\shaderapi"))
-			fRegularAddr = _ReturnAddress();
-		else
-			fOverlayAddr = _ReturnAddress();
-	}
-
-	// proof of concept, frankly would like to keep surface in use
-	//if (!Vars::Visuals::AntiOBS.Value ? (fRegularAddr && fRegularAddr != _ReturnAddress()) : (fOverlayAddr && fOverlayAddr != _ReturnAddress()))
-	if (G::Unload || fRegularAddr && fRegularAddr != _ReturnAddress())
-		return CALL_ORIGINAL(pDevice);
-
-	F::Render.Render(pDevice);
-
-	return CALL_ORIGINAL(pDevice);
-}*/
-
-/*MAKE_HOOK(Direct3DDevice9_Reset, U::Memory.GetVFunc(I::DirectXDevice, 16), HRESULT, __stdcall,
-	LPDIRECT3DDEVICE9 pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters)
-{
-	ImGui_ImplDX9_InvalidateDeviceObjects();
-	const HRESULT Original = CALL_ORIGINAL(pDevice, pPresentationParameters);
-	ImGui_ImplDX9_CreateDeviceObjects();
-	return Original;
-}*/
-
 LONG __stdcall WndProc::Func(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	if (F::Menu.IsOpen)

@@ -51,6 +51,8 @@ public:
 	void Draw(CTFPlayer* pLocal);
 
 	std::unordered_map<int, WeaponStorage> Storage = {};
+
+	bool m_bWishedCrit;
 };
 
 ADD_FEATURE(CCritHack, CritHack)

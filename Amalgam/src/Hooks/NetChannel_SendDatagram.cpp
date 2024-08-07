@@ -10,14 +10,15 @@ MAKE_HOOK(NetChannel_SendDatagram, S::NetChannel_SendDatagram(), int, __fastcall
 	if (!netChannel || datagram)
 		return CALL_ORIGINAL(netChannel, datagram);
 
+	// !!! THIS SHIT DOESN'T WORK! WHY? HAS I EVER? !!!
 	F::Backtrack.bFakeLatency = H::Entities.GetLocal() && Vars::Backtrack::Enabled.Value && Vars::Backtrack::Latency.Value;
-	if (!F::Backtrack.bFakeLatency)
+	if(!F::Backtrack.bFakeLatency)
 		return CALL_ORIGINAL(netChannel, datagram);
 
 	const int nInSequenceNr = netChannel->m_nInSequenceNr, nInReliableState = netChannel->m_nInReliableState;
 	F::Backtrack.AdjustPing(netChannel);
-	const int original = CALL_ORIGINAL(netChannel, datagram);
+	const auto pOriginal = CALL_ORIGINAL(netChannel, datagram);
 	netChannel->m_nInSequenceNr = nInSequenceNr, netChannel->m_nInReliableState = nInReliableState;
 
-	return original;
+	return pOriginal;
 }

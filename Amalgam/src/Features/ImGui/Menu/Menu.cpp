@@ -1217,7 +1217,7 @@ void CMenu::MenuSettings()
 			} EndSection();
 			SetCursorPosX(GetCursorPosX() + 8);
 			PushStyleColor(ImGuiCol_Text, F::Render.Inactive.Value);
-			Text("Built @ %s, %s", __DATE__, __TIME__);
+			Text(std::format("Built: {} @ {}", __DATE__, __TIME__).c_str());
 			PopStyleColor();
 
 			/* Column 2 */

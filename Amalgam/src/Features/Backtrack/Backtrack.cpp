@@ -11,8 +11,6 @@ void CBacktrack::Restart()
 	iLastInSequence = 0;
 }
 
-
-
 // Returns the wish cl_interp
 float CBacktrack::GetLerp()
 {
@@ -250,7 +248,7 @@ void CBacktrack::CleanRecords()
 
 		//const int iOldSize = pRecords.size();
 
-		const int flDeadtime = I::GlobalVars->curtime + GetReal() - flMaxUnlag; // int ???
+		const float flDeadtime = I::GlobalVars->curtime + GetReal() - flMaxUnlag;
 		while (!mRecords[pEntity].empty())
 		{
 			if (mRecords[pEntity].back().flSimTime >= flDeadtime)
@@ -313,9 +311,9 @@ void CBacktrack::ReportShot(int iIndex)
 // Adjusts the fake latency ping
 void CBacktrack::AdjustPing(CNetChannel* netChannel)
 {
-	for (const auto& cSequence : dSequences)
+	for(const auto& cSequence : dSequences)
 	{
-		if (I::GlobalVars->realtime - cSequence.CurTime >= GetFake())
+		if(I::GlobalVars->realtime - cSequence.CurTime >= GetFake())
 		{
 			netChannel->m_nInReliableState = cSequence.InReliableState;
 			netChannel->m_nInSequenceNr = cSequence.SequenceNr;

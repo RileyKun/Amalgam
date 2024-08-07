@@ -23,7 +23,7 @@ bool Timer::Run(unsigned ms)
 	return false;
 }
 
-inline void Timer::Update()
+void Timer::Update()
 {
 	Last = std::chrono::steady_clock::now();
 }

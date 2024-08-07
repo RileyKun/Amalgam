@@ -14,5 +14,5 @@ public:
 	Timer();
 	bool Check(unsigned ms) const;
 	bool Run(unsigned ms);
-	inline void Update();
+	void Update();
 };

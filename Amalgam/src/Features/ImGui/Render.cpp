@@ -7,36 +7,37 @@
 #include "Menu/Menu.h"
 #include "../Visuals/Visuals.h"
 
+std::once_flag initFlag;
+
 void CRender::Render(IDirect3DDevice9* pDevice)
 {
 	using namespace ImGui;
 
-	static std::once_flag initFlag;
 	std::call_once(initFlag, [&]
 		{
 			Initialize(pDevice);
 		});
 
-	pDevice->SetRenderState(D3DRS_COLORWRITEENABLE, 0xFFFFFFFF);
-	pDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
-	pDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
-	pDevice->SetRenderState(D3DRS_SRGBWRITEENABLE, false);
+	DWORD dwOldRGB; pDevice->GetRenderState(D3DRS_SRGBWRITEENABLE, &dwOldRGB);
+	pDevice->SetRenderState(D3DRS_SRGBWRITEENABLE, FALSE);
 
 	ImGui_ImplDX9_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	NewFrame();
 
+	// I think we can just set colors once at startup?
 	LoadColors();
-	PushFont(FontRegular);
 
+	// TODO: Move to CMenu::Render()
+	PushFont(FontRegular);
 	F::Menu.Render();
-	
+	// see line 30
 	PopFont();
 
 	EndFrame();
 	ImGui::Render();
 	ImGui_ImplDX9_RenderDrawData(GetDrawData());
-	pDevice->SetRenderState(D3DRS_SRGBWRITEENABLE, true);
+	pDevice->SetRenderState(D3DRS_SRGBWRITEENABLE, dwOldRGB);
 }
 
 void CRender::LoadColors()
@@ -115,7 +116,10 @@ void CRender::Initialize(IDirect3DDevice9* pDevice)
 
 	// Fonts
 	{
-		const auto& io = ImGui::GetIO();
+		auto& io = ImGui::GetIO();
+
+		io.IniFilename = nullptr;
+		io.LogFilename = nullptr;
 
 		ImFontConfig fontConfig;
 		fontConfig.OversampleH = 2;
@@ -128,14 +132,6 @@ void CRender::Initialize(IDirect3DDevice9* pDevice)
 		FontBlack = io.Fonts->AddFontFromFileTTF(R"(C:\Windows\Fonts\verdana.ttf)", 15.f, &fontConfig, fontRange);
 		FontTitle = io.Fonts->AddFontFromFileTTF(R"(C:\Windows\Fonts\verdana.ttf)", 20.f, &fontConfig, fontRange);
 		FontMono = io.Fonts->AddFontFromFileTTF(R"(C:\Windows\Fonts\verdana.ttf)", 15.f, &fontConfig, fontRange);
-
-		//FontSmall = io.Fonts->AddFontFromMemoryCompressedTTF(RobotoMedium_compressed_data, RobotoMedium_compressed_size, 11.f, &fontConfig, fontRange);
-		//FontRegular = io.Fonts->AddFontFromMemoryCompressedTTF(RobotoMedium_compressed_data, RobotoMedium_compressed_size, 13.f, &fontConfig, fontRange);
-		//FontBold = io.Fonts->AddFontFromMemoryCompressedTTF(RobotoBold_compressed_data, RobotoBold_compressed_size, 13.f, &fontConfig, fontRange);
-		//FontLarge = io.Fonts->AddFontFromMemoryCompressedTTF(RobotoMedium_compressed_data, RobotoMedium_compressed_size, 15.f, &fontConfig, fontRange);
-		//FontBlack = io.Fonts->AddFontFromMemoryCompressedTTF(RobotoBlack_compressed_data, RobotoBlack_compressed_size, 15.f, &fontConfig, fontRange);
-		//FontTitle = io.Fonts->AddFontFromMemoryCompressedTTF(RobotoMedium_compressed_data, RobotoMedium_compressed_size, 20.f, &fontConfig, fontRange);
-		//FontMono = io.Fonts->AddFontFromMemoryCompressedTTF(CascadiaMono_compressed_data, CascadiaMono_compressed_size, 15.f, &fontConfig, fontRange);
 
 		ImFontConfig iconConfig;
 		iconConfig.PixelSnapH = true;

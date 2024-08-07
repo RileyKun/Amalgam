@@ -53,8 +53,6 @@ void CCritHack::Fill(const CUserCmd* pCmd, int n)
 	iStart += n;
 }
 
-
-
 bool CCritHack::IsCritCommand(int iSlot, int iIndex, const i32 command_number, const bool bCrit, const bool bSafe)
 {
 	const auto uSeed = MD5_PseudoRandom(command_number) & 0x7FFFFFFF;
@@ -76,8 +74,6 @@ u32 CCritHack::DecryptOrEncryptSeed(int iSlot, int iIndex, u32 uSeed)
 	unsigned int iMask = iIndex << (iLeft + 8) | I::EngineClient->GetLocalPlayer() << iLeft;
 	return iMask ^ uSeed;
 }
-
-
 
 void CCritHack::GetTotalCrits(CTFPlayer* pLocal, CTFWeaponBase* pWeapon)
 {
@@ -222,8 +218,6 @@ bool CCritHack::WeaponCanCrit(CTFWeaponBase* pWeapon)
 	return true;
 }
 
-
-
 void CCritHack::ResetWeapons(CTFPlayer* pLocal)
 {
 	std::unordered_map<int, bool> mWeapons = {};
@@ -274,8 +268,6 @@ void CCritHack::Reset()
 	SDK::Output("Crithack", "Resetting all", { 0, 255, 255, 255 }, Vars::Debug::Logging.Value);
 }
 
-
-
 void CCritHack::Run(CTFPlayer* pLocal, CTFWeaponBase* pWeapon, CUserCmd* pCmd)
 {
 	if (!pLocal || !pWeapon || !pLocal->IsAlive() || !I::EngineClient->IsInGame())
@@ -302,7 +294,7 @@ void CCritHack::Run(CTFPlayer* pLocal, CTFWeaponBase* pWeapon, CUserCmd* pCmd)
 		|| pWeapon->m_iWeaponID() == TF_WEAPON_CANNON)
 	{
 		static float flBegin = -1.f;
-		if (pCmd->buttons& IN_ATTACK&& flBegin < 0.f && G::CanPrimaryAttack)
+		if (pCmd->buttons & IN_ATTACK && flBegin < 0.f && G::CanPrimaryAttack)
 			flBegin = I::GlobalVars->curtime;
 
 		const float flCharge = flBegin > 0.f ? I::GlobalVars->curtime - flBegin : 0.f;
@@ -341,18 +333,21 @@ void CCritHack::Run(CTFPlayer* pLocal, CTFWeaponBase* pWeapon, CUserCmd* pCmd)
 
 		const bool bCanCrit = Storage[pWeapon->m_iSlot()].AvailableCrits > 0 && (!CritBanned || pWeapon->m_iSlot() == SLOT_MELEE) && !bStreamWait;
 		const bool bPressed = Vars::CritHack::ForceCrits.Value || pWeapon->m_iSlot() == SLOT_MELEE && Vars::CritHack::AlwaysMelee.Value;
-		if (bCanCrit && bPressed && closestCrit)
+		if(bCanCrit && bPressed && closestCrit)
+		{
 			pCmd->command_number = closestCrit;
-		else if (Vars::CritHack::AvoidRandom.Value && closestSkip)
+			m_bWishedCrit = true;
+		}
+		else if(Vars::CritHack::AvoidRandom.Value && closestSkip)
+		{
 			pCmd->command_number = closestSkip;
+			m_bWishedCrit = false;
+		}
 
 		if (bRapidFire && !bStreamWait)
 			Storage[pWeapon->m_iSlot()].StreamWait = I::GlobalVars->tickcount + 1 / TICK_INTERVAL;
 	}
-	//else if (Vars::CritHack::AvoidRandom.Value && closestSkip)
-	//	pCmd->command_number = closestSkip;
 
-	//if (pCmd->command_number == closestCrit || pCmd->command_number == closestSkip)
 	WishRandomSeed = MD5_PseudoRandom(pCmd->command_number) & 0x7FFFFFFF;
 
 	if (pCmd->command_number == closestCrit)
@@ -379,7 +374,8 @@ bool CCritHack::CalcIsAttackCriticalHandler(CTFPlayer* pLocal, CTFWeaponBase* pW
 			return false;
 	}
 
-	if (WishRandomSeed)
+	// BUGBUG: G::RandomSeed() tied to client prediction?
+	if(WishRandomSeed)
 	{
 		*G::RandomSeed() = WishRandomSeed;
 		WishRandomSeed = 0;
@@ -390,14 +386,14 @@ bool CCritHack::CalcIsAttackCriticalHandler(CTFPlayer* pLocal, CTFWeaponBase* pW
 
 void CCritHack::Event(IGameEvent* pEvent, FNV1A_t uHash, CTFPlayer* pLocal)
 {
+	auto pWeapon = H::Entities.GetWeapon();
+	if(!pLocal || !pWeapon)
+		return;
+
 	switch (uHash)
 	{
 	case FNV1A::HashConst("player_hurt"):
 	{
-		auto pWeapon = H::Entities.GetWeapon();
-		if (!pLocal || !pWeapon)
-			return;
-
 		const int iVictim = I::EngineClient->GetPlayerForUserID(pEvent->GetInt("userid"));
 		const int iAttacker = I::EngineClient->GetPlayerForUserID(pEvent->GetInt("attacker"));
 

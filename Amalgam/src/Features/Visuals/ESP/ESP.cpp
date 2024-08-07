@@ -6,6 +6,8 @@
 MAKE_SIGNATURE(CTFPlayerSharedUtils_GetEconItemViewByLoadoutSlot, "client.dll", "48 89 6C 24 ? 56 41 54 41 55 41 56 41 57 48 83 EC", 0x0);
 MAKE_SIGNATURE(CEconItemView_GetItemName, "client.dll", "40 53 48 83 EC ? 48 8B D9 C6 81 ? ? ? ? ? E8 ? ? ? ? 48 8B 8B", 0x0);
 
+// NOTE: Pixy; this should really get re-written...
+
 void CESP::Run(CTFPlayer* pLocal)
 {
 	if (!Vars::ESP::Draw.Value)
@@ -86,7 +88,7 @@ void CESP::DrawPlayers(CTFPlayer* pLocal)
 			int lOffset = 0, rOffset = 0, bOffset = 2, tOffset = 0;
 			const auto& fFont = H::Fonts.GetFont(FONT_ESP);
 
-			const Color_t drawColor = H::Color.GetEntityDrawColor(pLocal, pPlayer, Vars::Colors::Relative.Value); //GetTeamColor(pPlayer->m_iTeamNum(), Vars::Colors::Relative.Value);
+			const Color_t drawColor = H::Color.GetEntityDrawColor(pLocal, pPlayer, Vars::Colors::Relative.Value);
 			const int iMaxHealth = pPlayer->m_iMaxHealth(), iHealth = pPlayer->IsDormant() ? pResource->GetHealth(pPlayer->entindex()) : pPlayer->m_iHealth(), iClassNum = pPlayer->m_iClass();
 
 			// Bones
@@ -494,7 +496,7 @@ void CESP::DrawBuildings(CTFPlayer* pLocal)
 		int x = 0, y = 0, w = 0, h = 0;
 		if (GetDrawBounds(pBuilding, x, y, w, h))
 		{
-			int lOffset = 0, rOffset = 0, /*bOffset = 0, */tOffset = 0;
+			int lOffset = 0, rOffset = 0, tOffset = 0;
 			const auto& fFont = H::Fonts.GetFont(FONT_ESP);
 
 			const Color_t drawColor = H::Color.GetEntityDrawColor(pLocal, pOwner ? pOwner : pBuilding, Vars::Colors::Relative.Value); //GetTeamColor(pBuilding->m_iTeamNum(), Vars::ESP::Main::Relative.Value);

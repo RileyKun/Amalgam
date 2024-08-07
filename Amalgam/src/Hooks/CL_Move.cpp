@@ -16,8 +16,6 @@ MAKE_HOOK(CL_Move, S::CL_Move(), void, __fastcall,
 	if (G::Unload)
 		return CALL_ORIGINAL(accumulated_extra_samples, bFinalTick);
 
-	F::Backtrack.iTickCount = I::GlobalVars->tickcount;
-
 	auto pLocal = H::Entities.GetLocal();
 	auto pWeapon = H::Entities.GetWeapon();
 
@@ -34,4 +32,5 @@ MAKE_HOOK(CL_Move, S::CL_Move(), void, __fastcall,
 		if (Line.m_flTime < 0.f)
 			Line.m_flTime = std::min(Line.m_flTime + 1.f, 0.f);
 	}
+	
 }

@@ -56,7 +56,6 @@ std::vector<Target_t> CAimbotHitscan::GetTargets(CTFPlayer* pLocal, CTFWeaponBas
 			if (pPlayer == pLocal || !pPlayer->IsAlive() || pPlayer->IsAGhost())
 				continue;
 
-			// Can we extinguish a teammate using the piss rifle?
 			if (bPissRifle && (pPlayer->m_iTeamNum() == pLocal->m_iTeamNum()))
 			{
 				if (!(Vars::Aimbot::Hitscan::Modifiers.Value & (1 << 6)) || !pPlayer->IsOnFire())
@@ -194,8 +193,6 @@ std::vector<Target_t> CAimbotHitscan::SortTargets(CTFPlayer* pLocal, CTFWeaponBa
 
 	return sortedTargets;
 }
-
-
 
 bool CAimbotHitscan::IsHitboxValid(int nHitbox) // check that this & all other uses are right
 {
@@ -531,8 +528,6 @@ int CAimbotHitscan::CanHit(Target_t& target, CTFPlayer* pLocal, CTFWeaponBase* p
 	return iReturn;
 }
 
-
-
 /* Returns whether AutoShoot should fire */
 bool CAimbotHitscan::ShouldFire(CTFPlayer* pLocal, CTFWeaponBase* pWeapon, CUserCmd* pCmd, const Target_t& target)
 {
@@ -654,7 +649,6 @@ Vec3 CAimbotHitscan::Aim(Vec3 vCurAngle, Vec3 vToAngle, int iMethod)
 		break;
 	}
 	}
-
 	return vReturn;
 }
 

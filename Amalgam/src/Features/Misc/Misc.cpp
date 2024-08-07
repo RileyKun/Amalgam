@@ -39,8 +39,6 @@ void CMisc::RunPost(CTFPlayer* pLocal, CUserCmd* pCmd, bool pSendPacket)
 	LegJitter(pLocal, pCmd, pSendPacket);
 }
 
-
-
 void CMisc::AutoJump(CTFPlayer* pLocal, CUserCmd* pCmd)
 {
 	if (!Vars::Misc::Movement::Bunnyhop.Value)

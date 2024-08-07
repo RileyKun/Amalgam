@@ -56,6 +56,9 @@ void CCore::Load()
 	F::Configs.LoadConfig(F::Configs.sCurrentConfig, false);
 	F::Menu.ConfigLoaded = true;
 
+	if(H::Entities.GetLocal())
+		G::IsConnected = true;
+
 	SDK::Output("Amalgam", "Loaded", { 175, 150, 255, 255 });
 }
 

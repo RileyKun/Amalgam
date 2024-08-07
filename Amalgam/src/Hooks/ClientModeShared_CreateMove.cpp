@@ -89,6 +89,7 @@ MAKE_HOOK(ClientModeShared_CreateMove, U::Memory.GetVFunc(I::ClientModeShared, 2
 	
 	F::EnginePrediction.Start(pLocal, pWeapon, pCmd);
 	{
+		F::Backtrack.iTickCount = I::GlobalVars->tickcount;
 		F::Backtrack.Run(pCmd);
 		const bool bAimRan = bSkip ? false : F::Aimbot.Run(pLocal, pWeapon, pCmd);
 		if (!bAimRan && G::CanPrimaryAttack && G::IsAttacking && !F::AimbotProjectile.bLastTickCancel)

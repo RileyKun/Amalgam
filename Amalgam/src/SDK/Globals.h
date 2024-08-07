@@ -50,7 +50,7 @@ struct DrawBox
 namespace G
 {
 	inline bool Unload = false;
-
+	inline bool IsConnected = false;
 	inline bool IsAttacking = false;
 	inline bool CanPrimaryAttack = false;
 	inline bool CanSecondaryAttack = false;

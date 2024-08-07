@@ -24,7 +24,13 @@ bool CCheaterDetection::ShouldScan()
 
 bool CCheaterDetection::InvalidPitch(CTFPlayer* pEntity)
 {
-	return Vars::CheaterDetection::Methods.Value & (1 << 0) && fabsf(pEntity->m_angEyeAnglesX()) > 89.9f;
+	if(Vars::CheaterDetection::Methods.Value & (1 << 0))
+	{
+		if(pEntity->m_angEyeAnglesX() > 90.f)
+			return true;
+	}
+	return false;
+	//return Vars::CheaterDetection::Methods.Value & (1 << 0) && fabsf(pEntity->m_angEyeAnglesX()) > 90.f;
 }
 
 bool CCheaterDetection::IsChoking(CTFPlayer* pEntity)
@@ -59,6 +65,7 @@ bool CCheaterDetection::IsFlicking(CTFPlayer* pEntity) // this is aggravating
 
 bool CCheaterDetection::IsDuckSpeed(CTFPlayer* pEntity)
 {
+	// Does not account for the slowdown when ducking... too bad!
 	if (!(Vars::CheaterDetection::Methods.Value & (1 << 3))
 		|| !pEntity->IsDucking() || !pEntity->OnSolid() // this may break on movement sim
 		|| pEntity->m_vecVelocity().Length2D() < pEntity->m_flMaxspeed() * 0.5f)
