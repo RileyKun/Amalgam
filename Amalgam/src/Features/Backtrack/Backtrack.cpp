@@ -312,7 +312,7 @@ void CBacktrack::ReportShot(int iIndex)
 void CBacktrack::AdjustPing(CNetChannel* netChannel)
 {
 	
-        for (auto cSequence = dSequences.begin(); it != dSequences.end(); ++it)
+        for (auto cSequence = dSequences.begin(); it != dSequences.end(); ++cSequence )
 	{
 		if (I::GlobalVars->realtime - cSequence.CurTime >= GetFake())
 		{
