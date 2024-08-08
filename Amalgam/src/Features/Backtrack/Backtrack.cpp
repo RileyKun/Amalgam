@@ -79,11 +79,11 @@ void CBacktrack::UpdateDatagram()
 	if (pNetChan->m_nInSequenceNr > iLastInSequence)
 	{
 		iLastInSequence = pNetChan->m_nInSequenceNr;
-		dSequences.push_front(CIncomingSequence(pNetChan->m_nInReliableState, pNetChan->m_nInSequenceNr, I::GlobalVars->realtime));
+		dSequences.emplace_front(CIncomingSequence(pNetChan->m_nInReliableState, pNetChan->m_nInSequenceNr, I::GlobalVars->realtime));
 	}
 
 	if (dSequences.size() > 2048)
-		dSequences.pop_back();
+		dSequences.erase(dSequences.begin() + 2048, dSequences.end());
 }
 
 
@@ -121,7 +121,7 @@ std::deque<TickRecord> CBacktrack::GetValidRecords(std::deque<TickRecord>* pReco
 		if (!WithinRewind(pTick))
 			continue;
 
-		validRecords.push_back(pTick);
+		validRecords.emplace_back(pTick);
 	}
 
 	if (pLocal)
@@ -225,7 +225,7 @@ void CBacktrack::MakeRecords()
 			}
 		}
 
-		mRecords[pEntity].push_front(curRecord);
+		mRecords[pEntity].emplace_front(curRecord);
 		mLagCompensation[pEntity] = bLagComp;
 
 		mDidShoot[pEntity->entindex()] = false;
@@ -254,7 +254,7 @@ void CBacktrack::CleanRecords()
 			if (mRecords[pEntity].back().flSimTime >= flDeadtime)
 				break;
 
-			mRecords[pEntity].pop_back();
+			mRecords[pEntity].pop_back(); //mRecords[pEntity].erase(mRecords[pEntity].begin() + size???, mRecords[pEntity].end()); figure this
 		}
 
 		//const int iNewSize = pRecords.size();
