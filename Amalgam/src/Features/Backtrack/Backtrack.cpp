@@ -311,12 +311,13 @@ void CBacktrack::ReportShot(int iIndex)
 // Adjusts the fake latency ping
 void CBacktrack::AdjustPing(CNetChannel* netChannel)
 {
-	for(const auto& cSequence : dSequences)
+	
+        for (auto cSequence = dSequences.begin(); it != dSequences.end(); ++it)
 	{
-		if(I::GlobalVars->realtime - cSequence.CurTime >= GetFake())
+		if (I::GlobalVars->realtime - cSequence.CurTime >= GetFake())
 		{
-			netChannel->m_nInReliableState = cSequence.InReliableState;
-			netChannel->m_nInSequenceNr = cSequence.SequenceNr;
+			netChannel->m_nInReliableState = cSequence->InReliableState;
+			netChannel->m_nInSequenceNr = cSequence->SequenceNr;
 			break;
 		}
 	}
