@@ -48,7 +48,7 @@ std::vector<Target_t> CAimbotProjectile::GetTargets(CTFPlayer* pLocal, CTFWeapon
 
 			const float flDistTo = (sortMethod == ESortMethod::DISTANCE) ? vLocalPos.DistTo(vPos) : 0.0f;
 			const int priority = F::AimbotGlobal.GetPriority(pPlayer->entindex());
-			validTargets.push_back({ pPlayer, ETargetType::PLAYER, vPos, vAngleTo, flFOVTo, flDistTo, priority });
+			validTargets.emplace_back(pPlayer, ETargetType::PLAYER, vPos, vAngleTo, flFOVTo, flDistTo, priority);
 		}
 	}
 
@@ -80,7 +80,7 @@ std::vector<Target_t> CAimbotProjectile::GetTargets(CTFPlayer* pLocal, CTFWeapon
 		if (flFOVTo > Vars::Aimbot::General::AimFOV.Value)
 			continue;
 		const float flDistTo = sortMethod == ESortMethod::DISTANCE ? vLocalPos.DistTo(vPos) : 0.0f;
-		validTargets.push_back({ pBuilding, isSentry ? ETargetType::SENTRY : (isDispenser ? ETargetType::DISPENSER : ETargetType::TELEPORTER), vPos, vAngleTo, flFOVTo, flDistTo });
+		validTargets.emplace_back(pBuilding, isSentry ? ETargetType::SENTRY : (isDispenser ? ETargetType::DISPENSER : ETargetType::TELEPORTER), vPos, vAngleTo, flFOVTo, flDistTo);
 	}
 
 	if (Vars::Aimbot::General::Target.Value & NPC)
@@ -96,7 +96,7 @@ std::vector<Target_t> CAimbotProjectile::GetTargets(CTFPlayer* pLocal, CTFWeapon
 			if (flFOVTo > Vars::Aimbot::General::AimFOV.Value)
 				continue;
 
-			validTargets.push_back({ pNPC, ETargetType::NPC, vPos, vAngleTo, flFOVTo, flDistTo });
+			validTargets.emplace_back(pNPC, ETargetType::NPC, vPos, vAngleTo, flFOVTo, flDistTo);
 		}
 	}
 
@@ -113,6 +113,7 @@ std::vector<Target_t> CAimbotProjectile::SortTargets(CTFPlayer* pLocal, CTFWeapo
 	std::vector<Target_t> sortedTargets = {};
 	int i = 0; for (auto& target : validTargets)
 	{
+		// if (validTargets.size() > Vars::Aimbot::General::MaxTargets.Value) break; test for me <3
 		i++; if (i > Vars::Aimbot::General::MaxTargets.Value) break;
 
 		sortedTargets.push_back(target);
@@ -248,7 +249,7 @@ std::vector<Vec3> ComputeSphere(float flRadius, int iSamples)
 
 		Vec3 point = Vec3(sinf(a1) * cosf(a2), sinf(a1) * sinf(a2), -cosf(a1)) * flRadius;
 
-		vPoints.push_back(point);
+		vPoints.emplace_back(point);
 	}
 
 	return vPoints;
@@ -284,7 +285,7 @@ std::vector<Point_t> CAimbotProjectile::GetSplashPoints(Target_t& target, std::v
 
 			return true;
 		};
-	for (auto it = vSpherePoints.begin(); it != vSpherePoints.end();)
+	for (auto it = vSpherePoints.begin(); it != vSpherePoints.end();) 
 	{
 		bool bErase = false;
 
@@ -318,7 +319,7 @@ std::vector<Point_t> CAimbotProjectile::GetSplashPoints(Target_t& target, std::v
 		{
 			return a.m_vPoint.DistTo(target.m_vPos) < b.m_vPoint.DistTo(target.m_vPos);
 		});
-	vPoints.resize(Vars::Aimbot::Projectile::SplashCount.Value);
+	vPoints.resize(vPoints.size(), size_t(0), Vars::Aimbot::Projectile::SplashCount.Value);
 
 	const Vec3 vOriginal = target.m_pEntity->GetAbsOrigin();
 	target.m_pEntity->SetAbsOrigin(target.m_vPos);
@@ -490,7 +491,7 @@ bool CAimbotProjectile::TestAngle(CTFPlayer* pLocal, CTFWeaponBase* pWeapon, Tar
 
 	const Vec3 vOriginal = target.m_pEntity->GetAbsOrigin();
 	target.m_pEntity->SetAbsOrigin(target.m_vPos);
-	for (int n = -1; n < iSimTime; n++)
+	for (int n = -1; n < iSimTime; ++n)
 	{
 		Vec3 Old = F::ProjSim.GetOrigin();
 		F::ProjSim.RunTick(projInfo);
@@ -653,7 +654,7 @@ int CAimbotProjectile::CanHit(Target_t& target, CTFPlayer* pLocal, CTFWeaponBase
 
 	Vec3 vAngleTo, vPredicted, vTarget;
 	int iLowestPriority = std::numeric_limits<int>::max(); float flLowestDist = std::numeric_limits<float>::max();
-	for (int i = 0; i < iMaxTime; i++)
+	for (int i = 0; i < iMaxTime; ++i)
 	{
 		const int iSimTime = i - TIME_TO_TICKS(flLatency);
 		if (!storage.m_bFailed)
@@ -680,9 +681,9 @@ int CAimbotProjectile::CanHit(Target_t& target, CTFPlayer* pLocal, CTFWeaponBase
 
 		std::vector<std::tuple<Point_t, int, int>> vPoints = {};
 		for (const auto& [iIndex, vPoint] : mDirectPoints)
-			vPoints.push_back({ { target.m_vPos + vPoint, {}}, iIndex + (iSplash == 2 ? Vars::Aimbot::Projectile::SplashCount.Value : 0), iIndex });
+			vPoints.emplace_back({target.m_vPos + vPoint, {}}, iIndex + (iSplash == 2 ? Vars::Aimbot::Projectile::SplashCount.Value : 0), iIndex);
 		for (const auto& vPoint : vSplashPoints)
-			vPoints.push_back({ vPoint, iSplash == 1 ? 3 : 0, -1 });
+			vPoints.emplace_back((vPoint, iSplash == 1 ? 3 : 0, -1);
 
 		for (auto& [vPoint, iPriority, iIndex] : vPoints) // get most ideal point
 		{
@@ -711,7 +712,7 @@ int CAimbotProjectile::CanHit(Target_t& target, CTFPlayer* pLocal, CTFWeaponBase
 				*pTimeTo = vPoint.m_Solution.m_flTime + flLatency;
 				*pMoveLines = storage.PredictionLines;
 				if (!pMoveLines->empty())
-					pMoveLines->push_back({ storage.m_MoveData.m_vecAbsOrigin, Math::GetRotatedPosition(storage.m_MoveData.m_vecAbsOrigin, Math::VelocityToAngles(storage.m_MoveData.m_vecVelocity * Vec3(1, 1, 0)).Length2D() + 90, Vars::Visuals::Simulation::SeparatorLength.Value) });
+					pMoveLines->emplace_back(storage.m_MoveData.m_vecAbsOrigin, Math::GetRotatedPosition(storage.m_MoveData.m_vecAbsOrigin, Math::VelocityToAngles(storage.m_MoveData.m_vecVelocity * Vec3(1, 1, 0)).Length2D() + 90, Vars::Visuals::Simulation::SeparatorLength.Value));
 				*pProjLines = vProjLines;
 			}
 		}
@@ -727,11 +728,11 @@ int CAimbotProjectile::CanHit(Target_t& target, CTFPlayer* pLocal, CTFWeaponBase
 		target.m_vAngleTo = vAngleTo;
 		if (Vars::Visuals::Hitbox::ShowHitboxes.Value)
 		{
-			pBoxes->push_back({ vPredicted, target.m_pEntity->m_vecMins(), target.m_pEntity->m_vecMaxs(), Vec3(), I::GlobalVars->curtime + (Vars::Visuals::Simulation::Timed.Value ? flTime : 5.f), Vars::Colors::HitboxEdge.Value, Vars::Colors::HitboxFace.Value, true });
+			pBoxes->emplace_back(vPredicted, target.m_pEntity->m_vecMins(), target.m_pEntity->m_vecMaxs(), Vec3(), I::GlobalVars->curtime + (Vars::Visuals::Simulation::Timed.Value ? flTime : 5.f), Vars::Colors::HitboxEdge.Value, Vars::Colors::HitboxFace.Value, true);
 
 			const float flSize = std::clamp(projInfo.m_vHull.x, 1.f, 3.f);
 			const Vec3 vSize = { flSize, flSize, flSize };
-			pBoxes->push_back({ vTarget, vSize * -1, vSize, Vec3(), I::GlobalVars->curtime + (Vars::Visuals::Simulation::Timed.Value ? flTime : 5.f), Vars::Colors::HitboxEdge.Value, Vars::Colors::HitboxFace.Value, true });
+			pBoxes->emplace_back(vTarget, vSize * -1, vSize, Vec3(), I::GlobalVars->curtime + (Vars::Visuals::Simulation::Timed.Value ? flTime : 5.f), Vars::Colors::HitboxEdge.Value, Vars::Colors::HitboxFace.Value, true);
 
 			if (Vars::Debug::Info.Value && target.m_nAimedHitbox == HITBOX_HEAD) // huntsman head
 			{
@@ -746,7 +747,7 @@ int CAimbotProjectile::CanHit(Target_t& target, CTFPlayer* pLocal, CTFWeaponBase
 				{
 					bBox.m_vecPos -= vOriginOffset;
 					bBox.m_flTime = I::GlobalVars->curtime + (Vars::Visuals::Simulation::Timed.Value ? flTime : 5.f);
-					pBoxes->push_back(bBox);
+					pBoxes->emplace_back(bBox);
 				}
 			}
 			if (Vars::Debug::Info.Value && target.m_nAimedHitbox == HITBOX_HEAD) // huntsman head, broken; removeme once 218 is fixed
@@ -763,7 +764,7 @@ int CAimbotProjectile::CanHit(Target_t& target, CTFPlayer* pLocal, CTFWeaponBase
 					bBox.m_vecPos -= vOriginOffset;
 					bBox.m_flTime = I::GlobalVars->curtime + (Vars::Visuals::Simulation::Timed.Value ? flTime : 5.f);
 					bBox.m_vecOrientation = Vec3(); 
-					pBoxes->push_back(bBox);
+					pBoxes->emplace_back(bBox);
 				}
 			}
 		}
@@ -902,9 +903,9 @@ bool CAimbotProjectile::RunMain(CTFPlayer* pLocal, CTFWeaponBase* pWeapon, CUser
 			if (Vars::Visuals::Simulation::Enabled.Value)
 			{
 				G::LinesStorage.clear();
-				G::LinesStorage.push_back({ vMoveLines, Vars::Visuals::Simulation::Timed.Value ? -int(vMoveLines.size()) : I::GlobalVars->curtime + 5.f, Vars::Colors::PredictionColor.Value });
+				G::LinesStorage.emplace_back(vMoveLines, Vars::Visuals::Simulation::Timed.Value ? -int(vMoveLines.size()) : I::GlobalVars->curtime + 5.f, Vars::Colors::PredictionColor.Value);
 				if (G::IsAttacking)
-					G::LinesStorage.push_back({ vProjLines, Vars::Visuals::Simulation::Timed.Value ? -int(vProjLines.size()) - TIME_TO_TICKS(F::Backtrack.GetReal()) : I::GlobalVars->curtime + 5.f, Vars::Colors::ProjectileColor.Value });
+					G::LinesStorage.emplace_back(vProjLines, Vars::Visuals::Simulation::Timed.Value ? -int(vProjLines.size()) - TIME_TO_TICKS(F::Backtrack.GetReal()) : I::GlobalVars->curtime + 5.f, Vars::Colors::ProjectileColor.Value);
 			}
 			if (Vars::Visuals::Hitbox::ShowHitboxes.Value)
 			{
