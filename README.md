@@ -7,7 +7,7 @@
   </a>
 </p>
 
-# Amalgam
+# Amalgam++
 [![Discord](https://img.shields.io/discord/1227898008373297223?logo=Discord&label=discord)](https://discord.gg/RbP9DfkUhe)
 [![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/RileyKun/Amalgam/msbuild.yml?branch=master)](/../../actions)
 
