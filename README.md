@@ -12,3 +12,5 @@
 [![GitHub Workflow Status (with event)](https://img.shields.io/github/actions/workflow/status/RileyKun/Amalgam/msbuild.yml?branch=master)](/../../actions)
 
 This is a maintained version that is separated from rei-kes' original work.
+
+Archived due to lack of motivation on working on open-source cheat projects.
